@@ -1,0 +1,17 @@
+{
+  "name": "figma-skills",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Coding-agent skills that turn a Figma design into a working app using the Figma REST API and a browser-based visual fidelity loop.",
+  "engines": {
+    "node": ">=20.6.0"
+  },
+  "scripts": {
+    "install-skills": "node install.mjs",
+    "test": "node run-tests.mjs"
+  },
+  "devDependencies": {
+    "yaml": "^2.9.0"
+  }
+}
