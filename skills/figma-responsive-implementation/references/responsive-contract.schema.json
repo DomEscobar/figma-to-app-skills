@@ -1,0 +1,713 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/figma-responsive-contract-v3.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "inputMode",
+    "profile",
+    "route",
+    "rendering",
+    "visual",
+    "imageAnalysis",
+    "references",
+    "breakpoints",
+    "probes",
+    "global",
+    "designScale",
+    "accessibility",
+    "codeQuality"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "const": 3
+    },
+    "inputMode": {
+      "enum": [
+        "figma-structured",
+        "image-only"
+      ]
+    },
+    "profile": {
+      "enum": [
+        "web",
+        "large-display"
+      ]
+    },
+    "viewingDistance": {
+      "type": "string",
+      "minLength": 1
+    },
+    "route": {
+      "type": "string",
+      "format": "uri"
+    },
+    "height": {
+      "type": "integer",
+      "minimum": 200,
+      "maximum": 10000
+    },
+    "rendering": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "browser",
+        "browserVersion",
+        "deviceScaleFactor",
+        "locale",
+        "timezoneId",
+        "colorScheme",
+        "reducedMotion",
+        "requiredFonts"
+      ],
+      "properties": {
+        "browser": {
+          "const": "chromium"
+        },
+        "browserVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "deviceScaleFactor": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "locale": {
+          "type": "string",
+          "minLength": 2
+        },
+        "timezoneId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "colorScheme": {
+          "enum": [
+            "light",
+            "dark"
+          ]
+        },
+        "reducedMotion": {
+          "enum": [
+            "reduce",
+            "no-preference"
+          ]
+        },
+        "requiredFonts": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "visual": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pixelThreshold",
+        "maxDiffRatio",
+        "includeAA"
+      ],
+      "properties": {
+        "pixelThreshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "maxDiffRatio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "includeAA": {
+          "type": "boolean"
+        }
+      }
+    },
+    "imageAnalysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "diffBlobs",
+        "visionDiagnostics",
+        "decisionAuthority"
+      ],
+      "properties": {
+        "diffBlobs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "channelThreshold",
+            "minAreaPx",
+            "mergeGapPx",
+            "maxBlobs",
+            "maxAllowedBlobAreaPx"
+          ],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "channelThreshold": { "type": "integer", "minimum": 0, "maximum": 255 },
+            "minAreaPx": { "type": "integer", "minimum": 1 },
+            "mergeGapPx": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "maxBlobs": { "type": "integer", "minimum": 1, "maximum": 1000 }
+            ,
+            "maxAllowedBlobAreaPx": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "visionDiagnostics": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "visionDiagnosticsSchema": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decisionAuthority": {
+          "const": "diagnostic-only"
+        }
+      }
+    },
+    "references": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "width",
+          "image",
+          "state"
+        ],
+        "properties": {
+          "width": {
+            "type": "integer",
+            "minimum": 200,
+            "maximum": 10000
+          },
+          "figmaNodeId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "image": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "breakpoints": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 201,
+        "maximum": 9999
+      }
+    },
+    "probes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "integer",
+        "minimum": 200,
+        "maximum": 10000
+      }
+    },
+    "global": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "horizontalOverflow",
+        "tolerancePx"
+      ],
+      "properties": {
+        "horizontalOverflow": {
+          "const": "forbidden"
+        },
+        "tolerancePx": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        }
+      }
+    },
+    "designScale": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "typography",
+        "spacing",
+        "controls",
+        "icons"
+      ],
+      "properties": {
+        "source": {
+          "enum": [
+            "existing",
+            "figma-derived",
+            "specified",
+            "inferred"
+          ]
+        },
+        "typography": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "minPx",
+              "maxPx"
+            ],
+            "properties": {
+              "minPx": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "maxPx": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "minLineHeightRatio": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "maxLineHeightRatio": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "maxMeasureEm": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          }
+        },
+        "spacing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "allowedPx",
+            "tolerancePx"
+          ],
+          "properties": {
+            "allowedPx": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "tolerancePx": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 4
+            }
+          }
+        },
+        "controls": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "minHeightPx"
+          ],
+          "properties": {
+            "minHeightPx": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "icons": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "allowedPx"
+          ],
+          "properties": {
+            "allowedPx": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "elements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "selector"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "selector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "insideViewport": {
+            "type": "boolean"
+          },
+          "noClip": {
+            "type": "boolean"
+          },
+          "typographyRole": {
+            "type": "string",
+            "minLength": 1
+          },
+          "control": {
+            "type": "boolean"
+          },
+          "icon": {
+            "type": "boolean"
+          },
+          "spacingProperties": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "gap",
+                "rowGap",
+                "columnGap",
+                "paddingTop",
+                "paddingRight",
+                "paddingBottom",
+                "paddingLeft",
+                "marginTop",
+                "marginRight",
+                "marginBottom",
+                "marginLeft"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "visible",
+              "hidden",
+              "no-overlap",
+              "dom-order",
+              "font-ratio",
+              "gap-range"
+            ]
+          },
+          "selector": {
+            "type": "string"
+          },
+          "a": {
+            "type": "string"
+          },
+          "b": {
+            "type": "string"
+          },
+          "before": {
+            "type": "string"
+          },
+          "after": {
+            "type": "string"
+          },
+          "larger": {
+            "type": "string"
+          },
+          "smaller": {
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "horizontal",
+              "vertical"
+            ]
+          },
+          "min": {
+            "type": "number"
+          },
+          "max": {
+            "type": "number"
+          },
+          "minPx": {
+            "type": "number"
+          },
+          "maxPx": {
+            "type": "number"
+          },
+          "minWidth": {
+            "type": "integer"
+          },
+          "maxWidth": {
+            "type": "integer"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "enum": [
+                    "visible",
+                    "hidden"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "selector"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "no-overlap"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "a",
+                "b"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "dom-order"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "before",
+                "after"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "font-ratio"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "larger",
+                "smaller"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "gap-range"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "before",
+                "after",
+                "direction"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "states": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "selector",
+          "action"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "selector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "action": {
+            "enum": [
+              "hover",
+              "focus",
+              "disabled"
+            ]
+          },
+          "requireFocusIndicator": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "accessibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "impact"
+      ],
+      "properties": {
+        "impact": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "minor",
+              "moderate",
+              "serious",
+              "critical"
+            ]
+          }
+        }
+      }
+    },
+    "codeQuality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceRoots",
+        "maxAbsoluteDeclarations",
+        "maxMediaQueriesPerFile",
+        "forbidFixedRootWidth",
+        "forbidUnboundedViewportTypography",
+        "forbidLayoutTransforms",
+        "allowlist"
+      ],
+      "properties": {
+        "sourceRoots": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "maxAbsoluteDeclarations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxMediaQueriesPerFile": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "forbidFixedRootWidth": {
+          "type": "boolean"
+        },
+        "forbidUnboundedViewportTypography": {
+          "type": "boolean"
+        },
+        "forbidLayoutTransforms": {
+          "type": "boolean"
+        },
+        "allowlist": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rule",
+              "file",
+              "line",
+              "reason"
+            ],
+            "properties": {
+              "rule": {
+                "type": "string",
+                "minLength": 1
+              },
+              "file": {
+                "type": "string",
+                "minLength": 1
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 8
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "profile": {
+            "const": "large-display"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "viewingDistance"
+        ],
+        "properties": {
+          "viewingDistance": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}

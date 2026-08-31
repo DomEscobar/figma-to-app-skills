@@ -1,0 +1,4 @@
+/.github/workflows/figma-gate.yml @REPLACE_WITH_OWNER
+/.figma-gate/ @REPLACE_WITH_OWNER
+/responsive-contract.json @REPLACE_WITH_OWNER
+/references/figma/ @REPLACE_WITH_OWNER

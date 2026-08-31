@@ -1,0 +1,23 @@
+name: figma-gate
+on: [pull_request]
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with: { node-version: 22 }
+      - run: npm ci
+        working-directory: .figma-gate
+      - run: npx playwright install --with-deps chromium
+        working-directory: .figma-gate
+      - name: Reject protected-input changes
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: git diff --exit-code "origin/${BASE_REF}...HEAD" -- .github/workflows/figma-gate.yml .figma-gate references/figma responsive-contract.json
+      - name: Run gate
+        run: node .figma-gate/scripts/figma-gate.mjs --contract responsive-contract.json --schema .figma-gate/references/responsive-contract.schema.json --integrity .figma-gate/integrity.json --out artifacts/report.json --screenshots artifacts/screenshots
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with: { name: figma-gate-report, path: artifacts }

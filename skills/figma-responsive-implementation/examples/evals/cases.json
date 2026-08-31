@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "good",
+      "query": "good",
+      "expectPass": true,
+      "expectedTypes": []
+    },
+    {
+      "name": "fixed-root",
+      "query": "fixed-root",
+      "expectPass": false,
+      "expectedTypes": [
+        "fixed-root-width",
+        "horizontal-overflow"
+      ]
+    },
+    {
+      "name": "uhd-small-font",
+      "query": "uhd-small",
+      "expectPass": false,
+      "expectedTypes": [
+        "font-too-small"
+      ],
+      "largeDisplay": true
+    },
+    {
+      "name": "absolute-layout",
+      "query": "absolute",
+      "expectPass": false,
+      "expectedTypes": [
+        "absolute-budget"
+      ]
+    },
+    {
+      "name": "breakpoint-edge",
+      "query": "breakpoint",
+      "expectPass": false,
+      "expectedTypes": [
+        "visible"
+      ]
+    },
+    {
+      "name": "long-text-clipping",
+      "query": "long-text",
+      "expectPass": false,
+      "expectedTypes": [
+        "clipped"
+      ]
+    },
+    {
+      "name": "missing-font",
+      "query": "good",
+      "expectPass": false,
+      "expectedTypes": [
+        "missing-font"
+      ],
+      "missingFont": true
+    },
+    {
+      "name": "desktop-regression",
+      "query": "desktop-regression",
+      "expectPass": false,
+      "expectedTypes": [
+        "not-visible",
+        "visual-diff"
+      ]
+    },
+    {
+      "name": "tampered-contract",
+      "query": "good",
+      "expectPass": false,
+      "expectedTypes": [
+        "integrity-mismatch"
+      ],
+      "tamper": true
+    }
+  ]
+}

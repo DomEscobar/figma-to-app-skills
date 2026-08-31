@@ -1,0 +1,200 @@
+{
+  "$schema": "../references/responsive-contract.schema.json",
+  "version": 3,
+  "inputMode": "figma-structured",
+  "profile": "web",
+  "route": "http://127.0.0.1:3000/",
+  "height": 900,
+  "rendering": {
+    "browser": "chromium",
+    "browserVersion": "PIN_AFTER_INSTALL",
+    "deviceScaleFactor": 1,
+    "locale": "en-US",
+    "timezoneId": "UTC",
+    "colorScheme": "light",
+    "reducedMotion": "reduce",
+    "requiredFonts": [
+      "Inter"
+    ]
+  },
+  "visual": {
+    "pixelThreshold": 0.1,
+    "maxDiffRatio": 0.005,
+    "includeAA": false
+  },
+  "imageAnalysis": {
+    "diffBlobs": {
+      "enabled": true,
+      "channelThreshold": 24,
+      "minAreaPx": 12,
+      "mergeGapPx": 4,
+      "maxBlobs": 50,
+      "maxAllowedBlobAreaPx": 100
+    },
+    "visionDiagnostics": null,
+    "visionDiagnosticsSchema": "../references/vision-diagnostics.schema.json",
+    "decisionAuthority": "diagnostic-only"
+  },
+  "references": [
+    {
+      "width": 390,
+      "figmaNodeId": "REPLACE",
+      "image": "references/mobile.png",
+      "state": "default"
+    },
+    {
+      "width": 1440,
+      "figmaNodeId": "REPLACE",
+      "image": "references/desktop.png",
+      "state": "default"
+    }
+  ],
+  "breakpoints": [
+    768,
+    1024
+  ],
+  "probes": [
+    320,
+    389,
+    390,
+    767,
+    768,
+    769,
+    1023,
+    1024,
+    1025,
+    1439,
+    1440,
+    1920
+  ],
+  "global": {
+    "horizontalOverflow": "forbidden",
+    "tolerancePx": 1
+  },
+  "designScale": {
+    "source": "inferred",
+    "typography": {
+      "body": {
+        "minPx": 16,
+        "maxPx": 20,
+        "minLineHeightRatio": 1.35,
+        "maxLineHeightRatio": 1.8,
+        "maxMeasureEm": 75
+      },
+      "title": {
+        "minPx": 32,
+        "maxPx": 72,
+        "minLineHeightRatio": 1,
+        "maxLineHeightRatio": 1.25
+      }
+    },
+    "spacing": {
+      "allowedPx": [
+        0,
+        4,
+        8,
+        12,
+        16,
+        24,
+        32,
+        48,
+        64,
+        96
+      ],
+      "tolerancePx": 1
+    },
+    "controls": {
+      "minHeightPx": 44
+    },
+    "icons": {
+      "allowedPx": [
+        16,
+        20,
+        24,
+        32,
+        48
+      ]
+    }
+  },
+  "elements": [
+    {
+      "name": "page-title",
+      "selector": "[data-testid='page-title']",
+      "required": true,
+      "insideViewport": true,
+      "noClip": true,
+      "typographyRole": "title",
+      "spacingProperties": [
+        "marginBottom"
+      ]
+    },
+    {
+      "name": "body-copy",
+      "selector": "[data-testid='body-copy']",
+      "required": true,
+      "insideViewport": true,
+      "noClip": true,
+      "typographyRole": "body"
+    },
+    {
+      "name": "primary-cta",
+      "selector": "[data-testid='primary-cta']",
+      "required": true,
+      "control": true
+    }
+  ],
+  "rules": [
+    {
+      "type": "visible",
+      "selector": "[data-testid='desktop-nav']",
+      "minWidth": 768
+    },
+    {
+      "type": "hidden",
+      "selector": "[data-testid='desktop-nav']",
+      "maxWidth": 767
+    },
+    {
+      "type": "no-overlap",
+      "a": "[data-testid='primary-cta']",
+      "b": "[data-testid='secondary-cta']"
+    },
+    {
+      "type": "font-ratio",
+      "larger": "[data-testid='page-title']",
+      "smaller": "[data-testid='body-copy']",
+      "min": 1.7,
+      "max": 4.5
+    }
+  ],
+  "states": [
+    {
+      "name": "primary-focus",
+      "selector": "[data-testid='primary-cta']",
+      "action": "focus",
+      "requireFocusIndicator": true
+    },
+    {
+      "name": "primary-hover",
+      "selector": "[data-testid='primary-cta']",
+      "action": "hover"
+    }
+  ],
+  "accessibility": {
+    "impact": [
+      "critical",
+      "serious"
+    ]
+  },
+  "codeQuality": {
+    "sourceRoots": [
+      "src"
+    ],
+    "maxAbsoluteDeclarations": 4,
+    "maxMediaQueriesPerFile": 8,
+    "forbidFixedRootWidth": true,
+    "forbidUnboundedViewportTypography": true,
+    "forbidLayoutTransforms": true,
+    "allowlist": []
+  }
+}

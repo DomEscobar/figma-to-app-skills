@@ -1,6 +1,6 @@
 # Figma → App skills
 
-Three [Agent Skills](https://github.com/anthropics/skills) that replace the paid
+Four [Agent Skills](https://github.com/anthropics/skills) that replace the paid
 Figma Dev Mode MCP with a free, scriptable pipeline: read a Figma design over the
 plain REST API, generate code in whatever stack your project already uses, and
 verify the result against the design with an automated visual-fidelity loop instead
@@ -25,13 +25,14 @@ do.
 Free/Starter plan, and **[some data is plan-gated](#whats-plan-gated)** — notably
 Variables, i.e. design tokens.
 
-## The three skills
+## The four skills
 
 | Skill | Does |
 | --- | --- |
 | [`figma-to-app`](skills/figma-to-app/SKILL.md) | Orchestrator. Detects your project's stack, then runs the other two in sequence. Trigger this one for the end-to-end task. |
 | [`figma-design-context`](skills/figma-design-context/SKILL.md) | Fetches a Figma file/frame via REST API + personal access token, simplifies it to compact YAML (layout, colors, type, components, interactive states), and exports referenced icons/images as real files. |
 | [`visual-fidelity-loop`](skills/visual-fidelity-loop/SKILL.md) | Deterministically screenshots a running implementation, pixel-diffs it against the Figma reference, and runs structured CSS-property assertions — so an agent can iterate to a real match instead of guessing when it's "close enough." |
+| [`figma-responsive-implementation`](skills/figma-responsive-implementation/SKILL.md) | Production-oriented acceptance harness for structured Figma or screenshot-only implementation: responsive probes, design-scale and geometry checks, localized pixel diffs, accessibility/state gates, protected contracts, adversarial evals, and optional DINOv2 diagnostics. |
 
 Each skill works standalone too — e.g. use `figma-design-context` alone to audit a
 design system's colors and spacing without building anything.
@@ -149,6 +150,7 @@ skills/
   figma-to-app/            orchestrator: stack detection + workflow
   figma-design-context/    Figma REST API -> simplified YAML + asset export
   visual-fidelity-loop/    deterministic capture, pixel diff, structured CSS checks
+  figma-responsive-implementation/  protected responsive acceptance contract + eval harness
 install.mjs                deploys skills to every agent's skill directory (see Install)
 FINDINGS.md                measured API behaviour, verification status, known gaps
 ```

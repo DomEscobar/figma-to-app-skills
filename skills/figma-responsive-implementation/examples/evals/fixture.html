@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Figma gate fixture</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;font-family:Arial,sans-serif;color:#14213d}main{max-width:1120px;margin:auto;padding:48px}
+nav{display:flex;gap:24px}.hero{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;min-height:520px}
+h1{font-size:clamp(32px,4vw,64px);line-height:1.1;margin:0 0 24px}.copy{font-size:18px;line-height:1.5;max-width:60ch}
+.actions{display:flex;gap:16px;margin-top:32px}button{min-height:48px;padding:8px 24px}button:focus{outline:3px solid #fca311}
+.visual{height:320px;background:#e5e5e5;border-radius:24px}
+@media(max-width:767px){main{padding:24px}.hero{grid-template-columns:1fr;gap:24px}nav{display:none}}
+body[data-case="fixed-root"] main{width:1440px;max-width:none}
+body[data-case="uhd-small"] h1{font-size:48px}@media(min-width:3000px){body[data-case="uhd-small"] h1{font-size:22px}}
+body[data-case="absolute"] .hero{position:relative;display:block}body[data-case="absolute"] h1{position:absolute;left:0;top:40px}
+body[data-case="absolute"] .copy{position:absolute;left:0;top:150px}body[data-case="absolute"] .actions{position:absolute;left:0;top:280px}
+body[data-case="absolute"] .visual{position:absolute;right:0;top:20px;width:45%}
+@media(min-width:768px){body[data-case="breakpoint"] nav{display:none}}
+body[data-case="long-text"] .copy{height:28px;overflow:hidden}
+@media(min-width:1200px){body[data-case="desktop-regression"] h1{display:none}}
+</style></head><body><main>
+<nav data-testid="desktop-nav"><a href="#">Home</a><a href="#">Docs</a></nav>
+<section class="hero"><div><h1 data-testid="page-title">A responsive product</h1>
+<p class="copy" data-testid="body-copy">Clear content remains readable at every supported viewport and with substantially longer translated text that is intended to expose clipping bugs.</p>
+<div class="actions"><button data-testid="primary-cta">Primary action</button><button data-testid="secondary-cta">Secondary</button></div></div>
+<div class="visual" role="img" aria-label="Decorative preview"></div></section></main>
+<script>document.body.dataset.case=new URLSearchParams(location.search).get("case")||"good";</script>
+</body></html>

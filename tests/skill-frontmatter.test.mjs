@@ -37,7 +37,11 @@ function readFrontmatter(skill) {
   const fields = {};
   for (const line of match[1].split(/\r?\n/)) {
     const field = line.match(/^([A-Za-z_][A-Za-z0-9_]*):\s*(.*)$/);
-    if (field) fields[field[1]] = field[2].trim();
+    if (field) {
+      const value = field[2].trim();
+      const quoted = value.match(/^(["'])(.*)\1$/);
+      fields[field[1]] = quoted ? quoted[2] : value;
+    }
   }
   return fields;
 }
