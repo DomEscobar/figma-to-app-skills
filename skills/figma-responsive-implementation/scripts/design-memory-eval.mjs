@@ -1,0 +1,18 @@
+#!/usr/bin/env node
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { checkDesignMemory, writeDesignMemorySnapshot } from "./design-memory.mjs";
+
+const temp=await fs.mkdtemp(path.join(os.tmpdir(),"design-memory-eval-"));
+const config={version:1,sourceRoots:["src"],componentRoots:["src/components"],extensions:[".css"],ignoreDirs:["node_modules","dist","build",".git","coverage"],allowRawValues:["0","0px","1px","100%","50%","-50%"],properties:["color","background-color","padding","width","height","gap","font-size","border-radius"]};
+async function setup(name,css,decisions={version:1,tokenMappings:[{figmaStyle:"Brand/Primary",codeToken:"--color-brand",provenance:"existing"}],approvedLiterals:[]}){const root=path.join(temp,name);await fs.mkdir(path.join(root,"src/components"),{recursive:true});await fs.writeFile(path.join(root,"src/components/card.css"),css);await fs.writeFile(path.join(root,"config.json"),JSON.stringify(config,null,2)+"\n");await fs.writeFile(path.join(root,"decisions.json"),JSON.stringify(decisions,null,2)+"\n");const options={root,configPath:path.join(root,"config.json"),decisionsPath:path.join(root,"decisions.json"),snapshotPath:path.join(root,"snapshot.json")};await writeDesignMemorySnapshot(options);return options;}
+const cleanCss=":root{--color-brand:#7357ff;--space-card:24px}.card{color:var(--color-brand);padding:var(--space-card);--hero-orb-size:37px;width:var(--hero-orb-size)}";
+const results=[];
+let o=await setup("clean",cleanCss);let r=await checkDesignMemory(o);results.push({name:"clean",ok:r.passed,types:r.findings.map(x=>x.type)});
+o=await setup("unknown",cleanCss+".bad{padding:23px}");r=await checkDesignMemory(o);results.push({name:"unknown-raw",ok:!r.passed&&r.findings.some(x=>x.type==="unknown-design-value"),types:r.findings.map(x=>x.type)});
+o=await setup("raw-token",cleanCss+".bad{padding:24px}");r=await checkDesignMemory(o);results.push({name:"raw-token-copy",ok:!r.passed&&r.findings.some(x=>x.type==="raw-token-value"),types:r.findings.map(x=>x.type)});
+o=await setup("ordinary-change",cleanCss);await fs.writeFile(path.join(path.dirname(o.configPath),"src/components/card.css"),".later{gap:var(--space-card)}\n"+cleanCss);r=await checkDesignMemory(o);results.push({name:"ordinary-change",ok:r.passed,types:r.findings.map(x=>x.type)});
+o=await setup("stale",cleanCss);await fs.appendFile(path.join(path.dirname(o.configPath),"src/components/card.css"),".later{--new-space:32px;gap:var(--new-space)}");r=await checkDesignMemory(o);results.push({name:"stale",ok:!r.passed&&r.findings.some(x=>x.type==="design-memory-stale"),types:r.findings.map(x=>x.type)});
+o=await setup("approved",cleanCss+".hairline{width:2px}",{version:1,tokenMappings:[{figmaStyle:"Brand/Primary",codeToken:"--color-brand",provenance:"existing"}],approvedLiterals:[{value:"2px",property:"width",file:"src/components/card.css",reason:"Optical SVG alignment exception",provenance:"figma-derived"}]});r=await checkDesignMemory(o);results.push({name:"approved-exception",ok:r.passed,types:r.findings.map(x=>x.type)});
+const passed=results.every(x=>x.ok);process.stdout.write(JSON.stringify({passed,temp,results},null,2)+"\n");if(!passed)process.exitCode=1;

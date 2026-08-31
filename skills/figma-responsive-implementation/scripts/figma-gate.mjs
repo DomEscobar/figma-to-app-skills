@@ -9,6 +9,7 @@ import axe from "axe-core";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 import { chromium } from "playwright";
+import { checkDesignMemory } from "./design-memory.mjs";
 
 const SHA = /^[a-f0-9]{64}$/;
 const CODE_EXT = new Set([".css",".scss",".sass",".less",".html",".js",".jsx",".ts",".tsx",".vue",".svelte"]);
@@ -74,6 +75,21 @@ async function validateContract(contractPath,schemaPath,verified) {
   for (const ref of contract.references) {
     const rp = path.resolve(path.dirname(cp),ref.image);
     if (!verified.has(rp)) throw new Error("reference-not-protected:"+ref.image);
+  }
+  if (contract.designMemory.enabled) {
+    const dm=contract.designMemory,contractDir=path.dirname(cp);
+    const protectedPaths=["config","decisions","snapshot","configSchema","decisionsSchema","snapshotSchema"];
+    for(const key of protectedPaths){
+      const file=resolveInside(contractDir,dm[key]);
+      if(!verified.has(file))throw new Error("design-memory-"+key+"-not-protected");
+    }
+    const [config,decisions,snapshot,configSchema,decisionsSchema,snapshotSchema]=await Promise.all([
+      dm.config,dm.decisions,dm.snapshot,dm.configSchema,dm.decisionsSchema,dm.snapshotSchema
+    ].map(rel=>fs.readFile(resolveInside(contractDir,rel),"utf8").then(JSON.parse)));
+    for(const [name,data,dataSchema] of [["config",config,configSchema],["decisions",decisions,decisionsSchema],["snapshot",snapshot,snapshotSchema]]){
+      const validateDesignMemory=ajv.compile(dataSchema);
+      if(!validateDesignMemory(data))throw new Error("Design memory "+name+" schema validation failed:\n"+JSON.stringify(validateDesignMemory.errors,null,2));
+    }
   }
   if (contract.imageAnalysis.visionDiagnostics) {
     const vp = path.resolve(path.dirname(cp),contract.imageAnalysis.visionDiagnostics);
@@ -318,6 +334,16 @@ export async function runGate(options) {
   const contract=await validateContract(options.contract,options.schema,verified);
   const contractDir=path.dirname(path.resolve(options.contract));
   const codeFindings=await codeQuality(contract,contractDir);
+  if(contract.designMemory.enabled){
+    const dm=contract.designMemory;
+    const memoryResult=await checkDesignMemory({
+      root:resolveInside(contractDir,dm.root),
+      configPath:resolveInside(contractDir,dm.config),
+      decisionsPath:resolveInside(contractDir,dm.decisions),
+      snapshotPath:resolveInside(contractDir,dm.snapshot)
+    });
+    codeFindings.push(...memoryResult.findings);
+  }
   let visionDiagnostics=null;
   if(contract.imageAnalysis.visionDiagnostics)visionDiagnostics=JSON.parse(await fs.readFile(path.resolve(contractDir,contract.imageAnalysis.visionDiagnostics),"utf8"));
   await fs.mkdir(options.screenshots,{recursive:true});

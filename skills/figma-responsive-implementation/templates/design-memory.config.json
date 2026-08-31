@@ -1,0 +1,17 @@
+{
+  "$schema": "references/design-memory-config.schema.json",
+  "version": 1,
+  "sourceRoots": ["src"],
+  "componentRoots": ["src/components"],
+  "extensions": [".css", ".scss", ".sass", ".less", ".html", ".jsx", ".tsx", ".vue", ".svelte"],
+  "ignoreDirs": ["node_modules", "dist", "build", ".git", "coverage"],
+  "allowRawValues": ["0", "0px", "1px", "100%", "50%", "-50%"],
+  "properties": [
+    "color", "background", "background-color", "border-color", "outline-color", "box-shadow",
+    "font-size", "line-height", "border-radius", "gap", "row-gap", "column-gap",
+    "padding", "padding-top", "padding-right", "padding-bottom", "padding-left",
+    "margin", "margin-top", "margin-right", "margin-bottom", "margin-left",
+    "width", "height", "min-width", "min-height", "max-width", "max-height",
+    "top", "right", "bottom", "left", "inset"
+  ]
+}

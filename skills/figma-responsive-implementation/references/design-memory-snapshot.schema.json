@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/design-memory-snapshot-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "inputHash", "stack", "sources", "tokens", "breakpoints", "tokenMappings", "findings"],
+  "properties": {
+    "version": {"const": 1},
+    "inputHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "stack": {"type": "object"},
+    "sources": {"type": "object"},
+    "tokens": {"type": "array"},
+    "breakpoints": {"type": "array"},
+    "tokenMappings": {"type": "array"},
+    "findings": {"type": "array"}
+  }
+}

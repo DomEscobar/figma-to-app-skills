@@ -1,6 +1,6 @@
 {
   "$schema": "../references/responsive-contract.schema.json",
-  "version": 3,
+  "version": 4,
   "inputMode": "figma-structured",
   "profile": "web",
   "route": "http://127.0.0.1:3000/",
@@ -196,5 +196,15 @@
     "forbidUnboundedViewportTypography": true,
     "forbidLayoutTransforms": true,
     "allowlist": []
+  },
+  "designMemory": {
+    "enabled": true,
+    "root": ".",
+    "config": ".figma-gate/design-memory.config.json",
+    "decisions": ".figma-gate/design-decisions.json",
+    "snapshot": ".figma-gate/design-system.snapshot.json",
+    "configSchema": ".figma-gate/references/design-memory-config.schema.json",
+    "decisionsSchema": ".figma-gate/references/design-decisions.schema.json",
+    "snapshotSchema": ".figma-gate/references/design-memory-snapshot.schema.json"
   }
 }

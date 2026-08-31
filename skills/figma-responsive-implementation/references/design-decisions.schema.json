@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/design-decisions-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "tokenMappings", "approvedLiterals"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"const": 1},
+    "tokenMappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["figmaStyle", "codeToken", "provenance"],
+        "properties": {
+          "figmaStyle": {"type": "string", "minLength": 1},
+          "codeToken": {"type": "string", "pattern": "^(--|\\$)[a-zA-Z0-9_-]+$"},
+          "provenance": {"enum": ["existing", "figma-derived", "specified", "inferred"]},
+          "note": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "approvedLiterals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["value", "property", "file", "reason", "provenance"],
+        "properties": {
+          "value": {"type": "string", "minLength": 1},
+          "property": {"type": "string", "minLength": 1},
+          "file": {"type": "string", "minLength": 1},
+          "reason": {"type": "string", "minLength": 8},
+          "provenance": {"enum": ["existing", "figma-derived", "specified", "inferred"]}
+        }
+      }
+    }
+  }
+}

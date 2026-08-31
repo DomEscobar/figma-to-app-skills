@@ -5,7 +5,8 @@
   "scripts": {
     "gate": "node scripts/figma-gate.mjs",
     "eval": "node scripts/eval.mjs",
-    "eval:image": "node scripts/image-only-eval.mjs"
+    "eval:image": "node scripts/image-only-eval.mjs",
+    "eval:memory": "node scripts/design-memory-eval.mjs"
   },
   "dependencies": {
     "ajv": "8.20.0",

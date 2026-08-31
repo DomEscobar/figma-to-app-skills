@@ -1,0 +1,6 @@
+{
+  "$schema": "references/design-decisions.schema.json",
+  "version": 1,
+  "tokenMappings": [],
+  "approvedLiterals": []
+}

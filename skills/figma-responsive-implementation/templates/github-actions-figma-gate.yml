@@ -16,6 +16,8 @@ jobs:
         env:
           BASE_REF: ${{ github.base_ref }}
         run: git diff --exit-code "origin/${BASE_REF}...HEAD" -- .github/workflows/figma-gate.yml .figma-gate references/figma responsive-contract.json
+      - name: Run design-memory policy eval
+        run: node .figma-gate/scripts/design-memory-eval.mjs
       - name: Run gate
         run: node .figma-gate/scripts/figma-gate.mjs --contract responsive-contract.json --schema .figma-gate/references/responsive-contract.schema.json --integrity .figma-gate/integrity.json --out artifacts/report.json --screenshots artifacts/screenshots
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

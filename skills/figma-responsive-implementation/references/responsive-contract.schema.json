@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://local.invalid/figma-responsive-contract-v3.schema.json",
+  "$id": "https://local.invalid/figma-responsive-contract-v4.schema.json",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -17,6 +17,7 @@
     "global",
     "designScale",
     "accessibility",
+    "designMemory",
     "codeQuality"
   ],
   "properties": {
@@ -24,7 +25,7 @@
       "type": "string"
     },
     "version": {
-      "const": 3
+      "const": 4
     },
     "inputMode": {
       "enum": [
@@ -152,13 +153,32 @@
             "maxAllowedBlobAreaPx"
           ],
           "properties": {
-            "enabled": { "type": "boolean" },
-            "channelThreshold": { "type": "integer", "minimum": 0, "maximum": 255 },
-            "minAreaPx": { "type": "integer", "minimum": 1 },
-            "mergeGapPx": { "type": "integer", "minimum": 0, "maximum": 100 },
-            "maxBlobs": { "type": "integer", "minimum": 1, "maximum": 1000 }
-            ,
-            "maxAllowedBlobAreaPx": { "type": "integer", "minimum": 0 }
+            "enabled": {
+              "type": "boolean"
+            },
+            "channelThreshold": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            },
+            "minAreaPx": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "mergeGapPx": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "maxBlobs": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000
+            },
+            "maxAllowedBlobAreaPx": {
+              "type": "integer",
+              "minimum": 0
+            }
           }
         },
         "visionDiagnostics": {
@@ -686,6 +706,71 @@
           }
         }
       }
+    },
+    "designMemory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "config": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decisions": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snapshot": {
+          "type": "string",
+          "minLength": 1
+        },
+        "configSchema": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decisionsSchema": {
+          "type": "string",
+          "minLength": 1
+        },
+        "snapshotSchema": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "enabled": {
+                "const": true
+              }
+            },
+            "required": [
+              "enabled"
+            ]
+          },
+          "then": {
+            "required": [
+              "root",
+              "config",
+              "decisions",
+              "snapshot",
+              "configSchema",
+              "decisionsSchema",
+              "snapshotSchema"
+            ]
+          }
+        }
+      ]
     }
   },
   "allOf": [

@@ -32,10 +32,17 @@ Variables, i.e. design tokens.
 | [`figma-to-app`](skills/figma-to-app/SKILL.md) | Orchestrator. Detects your project's stack, then runs the other two in sequence. Trigger this one for the end-to-end task. |
 | [`figma-design-context`](skills/figma-design-context/SKILL.md) | Fetches a Figma file/frame via REST API + personal access token, simplifies it to compact YAML (layout, colors, type, components, interactive states), and exports referenced icons/images as real files. |
 | [`visual-fidelity-loop`](skills/visual-fidelity-loop/SKILL.md) | Deterministically screenshots a running implementation, pixel-diffs it against the Figma reference, and runs structured CSS-property assertions — so an agent can iterate to a real match instead of guessing when it's "close enough." |
-| [`figma-responsive-implementation`](skills/figma-responsive-implementation/SKILL.md) | Production-oriented acceptance harness for structured Figma or screenshot-only implementation: responsive probes, design-scale and geometry checks, localized pixel diffs, accessibility/state gates, protected contracts, adversarial evals, and optional DINOv2 diagnostics. |
+| [`figma-responsive-implementation`](skills/figma-responsive-implementation/SKILL.md) | Production-oriented acceptance harness for structured Figma or screenshot-only implementation: persistent design-system memory, unknown-value/token enforcement, responsive probes, localized pixel diffs, accessibility/state gates, protected contracts, adversarial evals, and optional DINOv2 diagnostics. |
 
 Each skill works standalone too — e.g. use `figma-design-context` alone to audit a
 design system's colors and spacing without building anything.
+
+The responsive skill treats application code and token files as the source of truth.
+A deterministic `design-system.snapshot.json` indexes the styling stack, components,
+tokens, breakpoints, and Figma-to-code mappings so later agents do not rediscover them.
+Reviewed exceptions live separately in `design-decisions.json`. CI rejects stale
+snapshots, copied token literals, unknown design values, and unresolved token
+references; genuinely unique component geometry can remain local when documented.
 
 ## Quick start
 
@@ -170,6 +177,11 @@ npm test
 themselves stay dependency-free — the dev dependency exists only so the hand-rolled
 YAML emitter can be checked against a real parser instead of against itself, under
 both YAML 1.1 and 1.2.
+
+The responsive harness also includes `scripts/design-memory-eval.mjs`, which checks
+clean token usage, unknown literals, copied token values, stale snapshots, and
+approved local exceptions. Its browser evals use the pinned dependencies in
+`templates/figma-gate.package.json`.
 
 Tests whose dependencies aren't installed are skipped with a message naming what to
 install and where, so this works on a fresh clone. `visual-fidelity-loop`'s image

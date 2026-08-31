@@ -7,9 +7,15 @@ import crypto from "node:crypto";
 import process from "node:process";
 import { chromium } from "playwright";
 import { runGate } from "./figma-gate.mjs";
+import { writeDesignMemorySnapshot } from "./design-memory.mjs";
 const root=path.resolve(path.dirname(new URL(import.meta.url).pathname),"..");
 const example=path.join(root,"examples/evals");
 const schemaSource=path.join(root,"references/responsive-contract.schema.json");
+const memorySchemaSources={
+  "memory-config.schema.json":path.join(root,"references/design-memory-config.schema.json"),
+  "memory-decisions.schema.json":path.join(root,"references/design-decisions.schema.json"),
+  "memory-snapshot.schema.json":path.join(root,"references/design-memory-snapshot.schema.json")
+};
 const baseContract=JSON.parse(await fs.readFile(path.join(root,"templates/responsive-contract.json"),"utf8"));
 const cases=JSON.parse(await fs.readFile(path.join(example,"cases.json"),"utf8")).cases;
 const html=await fs.readFile(path.join(example,"fixture.html"));
@@ -47,6 +53,7 @@ try{
     await fs.writeFile(path.join(dir,"src/case.css"),sourceByCase[item.name]||".hero{display:grid}");
     await fs.copyFile(path.join(temp,"reference.png"),path.join(dir,"reference.png"));
     await fs.copyFile(path.join(temp,"schema.json"),path.join(dir,"schema.json"));
+    for(const [name,source] of Object.entries(memorySchemaSources))await fs.copyFile(source,path.join(dir,name));
     const c=structuredClone(baseContract);
     c.route="http://127.0.0.1:"+port+"/?case="+item.query;
     c.rendering.browserVersion=browserVersion;
@@ -55,13 +62,25 @@ try{
     c.breakpoints=[768];
     c.probes=[390,767,768,769,1440];
     c.codeQuality.sourceRoots=["src"];
+    c.designMemory={enabled:true,root:".",config:"memory-config.json",decisions:"memory-decisions.json",snapshot:"design-system.snapshot.json",configSchema:"memory-config.schema.json",decisionsSchema:"memory-decisions.schema.json",snapshotSchema:"memory-snapshot.schema.json"};
+    const memoryConfig={version:1,sourceRoots:["src"],componentRoots:["src"],extensions:[".css"],ignoreDirs:["node_modules","dist","build",".git","coverage"],allowRawValues:["0","0px","1px","100%","50%","-50%"],properties:["color","background-color","padding","width","height","gap","font-size","border-radius"]};
+    const memoryDecisions={version:1,tokenMappings:[],approvedLiterals:[]};
+    await fs.writeFile(path.join(dir,"memory-config.json"),JSON.stringify(memoryConfig,null,2)+"\n");
+    await fs.writeFile(path.join(dir,"memory-decisions.json"),JSON.stringify(memoryDecisions,null,2)+"\n");
+    await writeDesignMemorySnapshot({root:dir,configPath:path.join(dir,"memory-config.json"),decisionsPath:path.join(dir,"memory-decisions.json"),snapshotPath:path.join(dir,"design-system.snapshot.json")});
     if(item.largeDisplay){c.profile="large-display";c.viewingDistance="2-4m";c.probes.push(3840);c.designScale.typography.title.minPx=32;}
     const contractPath=path.join(dir,"contract.json"),schemaPath=path.join(dir,"schema.json"),referencePath=path.join(dir,"reference.png");
     await fs.writeFile(contractPath,JSON.stringify(c,null,2)+"\n");
     const manifest={version:1,files:{
       "contract.json":hash(await fs.readFile(contractPath)),
       "schema.json":hash(await fs.readFile(schemaPath)),
-      "reference.png":hash(await fs.readFile(referencePath))
+      "reference.png":hash(await fs.readFile(referencePath)),
+      "memory-config.json":hash(await fs.readFile(path.join(dir,"memory-config.json"))),
+      "memory-decisions.json":hash(await fs.readFile(path.join(dir,"memory-decisions.json"))),
+      "design-system.snapshot.json":hash(await fs.readFile(path.join(dir,"design-system.snapshot.json"))),
+      "memory-config.schema.json":hash(await fs.readFile(path.join(dir,"memory-config.schema.json"))),
+      "memory-decisions.schema.json":hash(await fs.readFile(path.join(dir,"memory-decisions.schema.json"))),
+      "memory-snapshot.schema.json":hash(await fs.readFile(path.join(dir,"memory-snapshot.schema.json")))
     }};
     const manifestPath=path.join(dir,"integrity.json");
     await fs.writeFile(manifestPath,JSON.stringify(manifest,null,2)+"\n");

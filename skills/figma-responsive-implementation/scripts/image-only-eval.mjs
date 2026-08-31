@@ -48,6 +48,7 @@ async function execute(name,fault){
   c.probes=[1200];
   c.states=[];
   c.codeQuality.sourceRoots=["src"];
+  c.designMemory={enabled:false};
   c.codeQuality.maxAbsoluteDeclarations=0;
   c.elements=[
     {name:"page-title",selector:"[data-testid='page-title']",required:true,insideViewport:true,noClip:true,typographyRole:"title"},
