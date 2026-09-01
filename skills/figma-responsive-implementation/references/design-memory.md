@@ -16,7 +16,9 @@ The application code and its token files remain authoritative. `design-system.sn
 3. Keep a truly unique illustration or component geometry value local as a custom property or constant.
 4. Use `approvedLiterals` only when a literal cannot reasonably be expressed through the existing system. Scope it to a property and file, explain why, and record provenance.
 
-The scanner rejects a literal that duplicates a known token (`raw-token-value`), a new unexplained literal (`unknown-design-value`), unresolved token references/mappings, and a snapshot whose token/stack/config/decision hash no longer matches (`design-memory-stale`). Ordinary component edits that only reuse known tokens do not stale the snapshot.
+The initial snapshot inventories existing literal debt without making adoption impossible. Checks compare that baseline as a multiset keyed by type, file, property, and value: moving or adding a literal creates a new finding even when the same value already exists elsewhere. The scanner rejects a new literal that duplicates a known token (`raw-token-value`), a new unexplained literal (`unknown-design-value`), unresolved token references/mappings, and a snapshot whose token/stack/config/decision hash no longer matches (`design-memory-stale`). Ordinary component edits that only reuse known tokens do not stale the snapshot.
+
+The scanner covers stylesheet declarations, JSX/TSX/Vue/Svelte object-style literals, React numeric length values, CSS named colors, and Tailwind arbitrary-value utilities. Framework-native linting remains responsible for syntax the conservative scanner cannot identify deterministically.
 
 ## Trust boundary
 

@@ -39,12 +39,16 @@ test("accepts tokenized application styles", async (t) => {
 });
 
 test("rejects an unexplained design literal", async (t) => {
-  const result = await checkDesignMemory(await fixture(t, `${baseCss}.bad{padding:23px}`));
+  const options = await fixture(t, baseCss);
+  await fs.appendFile(path.join(options.root, "src/components/card.css"), ".bad{padding:23px}");
+  const result = await checkDesignMemory(options);
   assert(result.findings.some((finding) => finding.type === "unknown-design-value"));
 });
 
 test("rejects copying an existing token value", async (t) => {
-  const result = await checkDesignMemory(await fixture(t, `${baseCss}.bad{padding:24px}`));
+  const options = await fixture(t, baseCss);
+  await fs.appendFile(path.join(options.root, "src/components/card.css"), ".bad{padding:24px}");
+  const result = await checkDesignMemory(options);
   assert(result.findings.some((finding) => finding.type === "raw-token-value"));
 });
 

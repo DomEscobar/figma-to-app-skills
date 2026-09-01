@@ -179,8 +179,10 @@ YAML emitter can be checked against a real parser instead of against itself, und
 both YAML 1.1 and 1.2.
 
 The responsive harness also includes `scripts/design-memory-eval.mjs`, which checks
-clean token usage, unknown literals, copied token values, stale snapshots, and
-approved local exceptions. Its browser evals use the pinned dependencies in
+clean token usage, unknown literals, copied token values, grandfathered legacy debt
+without expansion, JSX object styles, React numeric lengths, Tailwind arbitrary
+values, named colors, stale stack/token snapshots, and approved local exceptions.
+Its browser evals use the pinned dependencies in
 `templates/figma-gate.package.json`.
 
 Tests whose dependencies aren't installed are skipped with a message naming what to

@@ -44,7 +44,7 @@ Pass only when:
 - every authored viewport passes visual and geometry thresholds;
 - every probe passes responsive and scale invariants;
 - required states and serious/critical accessibility checks pass;
-- code-quality and design-memory findings are empty; copied token literals, unexplained values, unresolved mappings/references, and stale snapshots fail;
+- code-quality findings and new design-memory findings are empty; copied token literals, unexplained values, expansions of inventoried legacy debt, unresolved mappings/references, and stale snapshots fail;
 - protected hashes and protected-file CI checks pass;
 - repository tests pass;
 - no previously green viewport regresses.
