@@ -118,11 +118,12 @@ async function install({ link, targetIds, projectRoot }) {
 
   if (!link) {
     console.log("\nRe-run this script after editing a skill in this repo — copies don't auto-update.");
-    // Dependencies are deliberately not copied, so the copied skill can't run its
-    // browser scripts until they're installed where it now lives.
+    // Dependencies are deliberately not copied, so copied browser skills need a
+    // local install before their scripts can run.
     console.log(
-      "visual-fidelity-loop needs its dependencies installed in each location it was copied to:\n" +
+      "Browser skills need dependencies installed in each copied location:\n" +
         "  cd <skills-dir>/visual-fidelity-loop/scripts && npm install && npx playwright install chromium\n" +
+        "  cd <skills-dir>/figma-browser-capture/scripts && npm install && npx playwright install chromium\n" +
         "Use --link instead to share this repo's already-installed dependencies.",
     );
   }

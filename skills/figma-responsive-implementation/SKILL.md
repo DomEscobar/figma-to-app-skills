@@ -25,7 +25,7 @@ One image proves only that width and state. Mark other behavior as inferred. Lar
 
 1. Inspect repository primitives, tokens, fonts, breakpoints, styling conventions, components, and tests. Run `scripts/design-memory.mjs scan` in the trusted setup step to create a protected `design-system.snapshot.json` from the real application code and token files.
 2. Review `design-decisions.json`. Map Figma styles to existing code tokens; record only narrow, justified exceptions with provenance. The code and token files are authoritative; the snapshot is a regenerable index.
-3. In structured mode, extract Figma assets, auto-layout, variants, fixed/fill/hug semantics, and reference dimensions. In image-only mode, keep the reference immutable and record inferred structure separately.
+3. In structured mode, extract Figma assets, auto-layout, variants, fixed/fill/hug semantics, and reference dimensions. When REST access is absent or rate-limited, run `figma-browser-capture` and verify its `frame.png`, capture manifest, integrity file, and optional visible-inspector evidence before use. Treat fields not confirmed by the visible inspector as image-only inference; never reconstruct a complete node tree from the WebGL canvas. In ordinary image-only mode, keep the reference immutable and record inferred structure separately.
 4. Create the contract from templates/responsive-contract.json.
    - Reuse an existing design system.
    - Otherwise derive the smallest coherent typography, spacing, icon, control, and layout scale.

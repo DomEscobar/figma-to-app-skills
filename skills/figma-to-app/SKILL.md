@@ -1,6 +1,6 @@
 ---
 name: figma-to-app
-description: Orchestrates building or updating a real, working app/page/component from a Figma design link, end to end, without the paid Figma MCP or Dev Mode seat. Use when the user pastes a figma.com URL and asks to build, implement, clone, recreate, or "pixel-perfect" match it in code, in whatever stack their repo already uses. Composes figma-design-context and visual-fidelity-loop: fetch design data, detect the stack, generate code, verify visually.
+description: Orchestrates building or updating a real app/page/component from a Figma link, including browser capture when REST access is missing or rate-limited. Use when the user asks to build, clone, recreate, or pixel-match a Figma design in an existing codebase.
 ---
 
 # Figma to App
@@ -12,9 +12,10 @@ enough by eye." Each phase is its own skill; this document is the workflow that
 strings them together and the decisions that only make sense at the workflow
 level (which stack, how much to build at once, when to stop iterating).
 
-Read this skill's own two reference files as needed; read the sub-skills'
-`SKILL.md` files (`figma-design-context`, `visual-fidelity-loop`) for the actual
-script usage — this file intentionally doesn't repeat their command syntax.
+Read this skill's own references as needed; read the selected sub-skills'
+`SKILL.md` files (`figma-design-context` or `figma-browser-capture`, then
+`figma-responsive-implementation` and `visual-fidelity-loop`) for actual
+script usage. This file intentionally does not repeat their command syntax.
 
 ## Why this exists instead of the official Figma MCP
 
@@ -28,18 +29,23 @@ plain scripts an agent runs.
 
 ## Phase 1 — Extract
 
-Use the **`figma-design-context`** skill. At minimum you need the Figma URL (with
-a `node-id` if the user selected a specific frame — ask for one if they only
-pasted a whole-file link and the file has multiple screens) and a personal access
-token (`FIGMA_API_KEY` env var, or ask the user for one — see that skill's Setup
-section). The output is a YAML description of layout/styling plus a manifest of
-downloaded icon/image assets.
+Start with the Figma URL and prefer a selected frame carrying `node-id`.
 
-Before moving on, skim the extracted YAML yourself: check the root node's
-`layout.designedWidth`/`designedHeight` for the design's reference viewport, and
-note how many distinct entries land in `globalVars.styles` — a design with three
-button styles and a design with fifteen call for different levels of
-componentization, and you'll only notice by looking.
+- When protected REST credentials are already configured and the request is
+  within budget, use **`figma-design-context`**. Its output is structured YAML
+  plus exported asset provenance.
+- When credentials are unavailable or a file/content/image endpoint returns
+  `429`, use **`figma-browser-capture`**. Capture only a public link or an
+  already-authorized local browser session. Its output is a sealed `frame.png`,
+  capture manifest, integrity file, and optional visible-inspector evidence.
+- Never collect credentials in chat or retry a long `Retry-After` loop. Browser
+  capture is an authorized fallback, not an access-control or rate-limit bypass.
+
+Before moving on, inspect the selected evidence. For structured YAML, check
+`layout.designedWidth`/`designedHeight` and `globalVars.styles`. For browser
+capture, verify hashes, viewport, measured DPR, stability results, crop, and every
+visible-inspector provenance entry. Treat missing node structure and states as
+inferred.
 
 ## Phase 2 — Detect the stack, then generate
 
@@ -49,25 +55,27 @@ Read `references/stack-detection.md` for the checklist — do not default to Rea
 whole point of skipping a rigid framework-specific generator is to match the
 codebase you were dropped into.
 
-Then generate the components/markup, applying the extracted layout and style data
-node by node. Two rules apply regardless of stack:
+Then generate the components/markup, applying only confirmed layout and style
+evidence. These rules apply regardless of stack:
 
-1. **Stamp `data-figma-id="<id>"` on every element generated from a Figma node.**
+1. **Stamp `data-figma-id="<id>"` on every element generated from a confirmed Figma node.**
    This is the join key Phase 3 uses to localize a visual mismatch back to the
    exact node that caused it, instead of guessing. Skipping it on "unimportant"
-   elements is the most common way this whole pipeline degrades back into manual
-   pixel-chasing.
-2. **Let `globalVars.styles` drive componentization.** When several nodes
-   reference the same style key, that's Figma stating "these are the same thing"
-   — express it as one shared component/class, not N copies of similar-looking
-   CSS that will drift the moment someone edits one of them.
-3. **Build the states, not just the default frame.** If the extraction contains
+   elements is the most common way structured mode degrades back into manual
+   pixel-chasing. In browser-only mode, never invent ids; use stable application
+   test ids and mark the mapping inferred.
+2. **Let confirmed design-system evidence drive componentization.** In structured
+   mode, shared `globalVars.styles` keys identify common components/classes. In
+   browser mode, combine visible-inspector evidence with the target repository's
+   design memory; do not promote repeated-looking pixels into a Figma token claim.
+3. **Build authored states, not just the default frame.** If structured extraction contains
    `interactions` or `variantProperties`, the design specifies hover/pressed/focus
    behavior; the `interactive-states.md` reference bundled with the
    `figma-design-context` skill covers which of those become CSS pseudo-classes
    and which need real application state. Phase 3
    verifies the default state by screenshot — it will not tell you that a designed
-   hover state was never built, so that omission is on you to not make.
+   hover state was never built. In browser-only mode, implement only observed
+   states and mark every other state inferred.
 
 Build incrementally rather than the whole screen in one shot when the frame is
 large or has repeated sections (e.g. a card grid): get one instance of a repeated
@@ -76,8 +84,8 @@ bug doesn't get multiplied across the whole page before you notice it.
 
 ## Phase 3 — Verify and iterate
 
-Use the **`visual-fidelity-loop`** skill against the running app (dev server) and
-the Figma frame's own rendered image. Run it after every meaningfully-sized chunk
+Use the **`visual-fidelity-loop`** skill against the running app and the protected
+REST export or browser-captured `frame.png`. Run it after every meaningfully-sized chunk
 of generated UI, not only once at the very end — a mismatch caught after one
 component is a two-minute fix; the same mismatch caught after twelve components
 were built on the same wrong assumption is not.
@@ -104,8 +112,9 @@ actually help" a answerable question instead of a vibe.
 
 ## Definition of done
 
-- Every element with a visual role in the design has a generated counterpart
-  carrying its `data-figma-id`.
+- Every element with a visual role has a generated counterpart. Confirmed
+  structured nodes carry `data-figma-id`; browser-only elements use stable test
+  ids without fabricated Figma ids.
 - The visual fidelity loop's structured checks pass (or documented gaps are
   called out explicitly to the user — text overflow behavior, a missing web
   font license, browser-only rendering quirks).

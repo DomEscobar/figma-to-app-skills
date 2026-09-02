@@ -107,8 +107,10 @@ fetched. On a `--project` install that would have landed one user's design data 
 someone else's repository, and a stale cache would have answered requests for a file
 it didn't belong to. Both are now excluded; the payload dropped to **256 KB**.
 
-The trade-off is that a copied `visual-fidelity-loop` needs its own `npm install`
-where it now lives, which the installer prints. `--link` avoids this by sharing the
+The original four-skill payload measured 256 KB. The current five-skill bundle,
+including `figma-browser-capture` and both browser lockfiles, measures 536 KB in a
+scratch project with no `node_modules` or API cache copied. Copied browser skills
+need their own `npm install`, which the installer prints; `--link` shares the
 repo's dependencies.
 
 ## 6. Verification status
@@ -120,14 +122,15 @@ repo's dependencies.
 | Prototype interactions, variant axes | Unit-tested; variant name parsing checked against real button-kit names |
 | Rate-limit retry / fail-fast logic | Unit-tested, and the 429 path observed live |
 | `visual-fidelity-loop` image normalization, CLI parsing | Unit-tested |
+| `figma-browser-capture` stability, URL/CDP boundaries, inspector provenance, asset sealing | Browser-tested with stable/fault fixtures; public live Figma capture still pending |
 | `capture.mjs`, `check-styles.mjs`, `diff.mjs` end to end | Run against a live page: capture succeeded, 20/20 style checks passed, diff ratio 0.43% |
 | Full pipeline on a real design | Done once, on a portfolio frame: fetch → YAML → asset export → hand-written HTML → screenshot → diff |
 | Cross-agent frontmatter rules | Enforced by a repo-level test |
-| Install / delivery path | Verified into a scratch project: 256 KB payload, no dependencies or API cache copied |
+| Install / delivery path | Verified into a scratch project: 536 KB five-skill payload, no dependencies or API cache copied |
 | Determinism injection (`lib/determinism.mjs`) | Exercised by the demo runs only; no unit test (needs a browser) |
 | Whole component-set extraction (360 variants) | **Not done** — blocked by the rate limit until ~9 Aug |
 
-62 tests pass. On a fresh clone, tests whose dependencies aren't installed are
+73 tests pass. On a fresh clone, tests whose dependencies aren't installed are
 skipped with instructions rather than failing.
 
 ## 7. Known gaps
@@ -146,3 +149,7 @@ call at codegen time.
 - **The pipeline has been proven on one frame, one stack (hand-written HTML/CSS).**
 Stack detection for React/Vue/Tailwind projects is documented but has not been run
 against a real project of each kind.
+- **Browser capture has not yet been exercised against a real authorized Figma
+  frame in this repository.** Its managed Chromium path is forward-tested against
+  stable and intentionally changing canvas fixtures; a live run still needs a
+  public frame link or an already-authorized loopback CDP session.

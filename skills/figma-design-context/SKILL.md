@@ -30,16 +30,14 @@ Personal access tokens → generate one, scoped at minimum to `file_content:read
 (add `file_dev_resources:read` only if you also need dev-resource links). This
 works on every plan, including Free — it is not the same thing as a Dev Mode seat.
 
-Set it as an environment variable so it never needs to be typed into a prompt:
+Provide it through the host's protected credential mechanism so it never appears
+in prompts, commands, URLs, process listings, or logs. Do not use the direct
+`--token` argument in agent workflows.
 
-```bash
-export FIGMA_API_KEY="figd_..."     # macOS/Linux
-$env:FIGMA_API_KEY = "figd_..."     # PowerShell
-```
-
-The scripts also accept `--token <pat>` directly if the environment variable isn't
-set. If you only have a share link and no token, ask the user for one before
-proceeding — there is no way to read file content without it.
+When no protected REST credential is configured, invoke `figma-browser-capture`
+instead of requesting a credential in chat. That branch can seal pixels and
+visible-inspector evidence from an authorized browser, but it cannot prove a
+complete Figma node tree.
 
 ## Workflow
 
@@ -136,8 +134,9 @@ command line, but double check if you're constructing ids yourself downstream); 
 429 is the one to take seriously: on a Free/Starter file the file-reading endpoints are
 budgeted at only a handful of requests **per month**, per token and across every file
 that token can reach, and a measured lockout came back asking for a **4.6-day** wait.
-The client reports the real reset time and fails fast rather than sleeping through it —
-there is no retry that gets you out of it. What the budget counts is the *number* of
+The client reports the real reset time and fails fast rather than sleeping through it.
+Switch to `figma-browser-capture` when authorized browser access is available;
+do not use that fallback to evade permissions. What the budget counts is the *number* of
 file reads, not their size, so plan for one deliberate fetch of exactly the frame you
 need (`--node-id`) instead of exploring a file across several calls, and leave the
 on-disk `.figma-cache/` alone (don't pass `--no-cache` while iterating) since after a

@@ -1,8 +1,9 @@
 # Figma → App skills
 
-Four [Agent Skills](https://github.com/anthropics/skills) that replace the paid
+Five [Agent Skills](https://github.com/anthropics/skills) that replace the paid
 Figma Dev Mode MCP with a free, scriptable pipeline: read a Figma design over the
-plain REST API, generate code in whatever stack your project already uses, and
+plain REST API or an authorized browser capture, generate code in the project's
+existing stack, and
 verify the result against the design with an automated visual-fidelity loop instead
 of eyeballing screenshots.
 
@@ -10,8 +11,8 @@ No MCP server, no Dev Mode seat, no vendor lock-in — just a `SKILL.md` per ski
 plus Node scripts, following the same open format Claude Code, OpenCode, Cursor, and
 most other coding agents already discover skills from. Any one agent can run this end
 to end; nothing here is written against a specific agent's tool-calling API. The
-Figma-side scripts need nothing but Node itself; only the browser-based verification
-step pulls in dependencies.
+REST extraction needs only Node itself; browser capture and verification install
+their pinned Playwright/image dependencies locally.
 
 ## Why this exists
 
@@ -25,12 +26,13 @@ do.
 Free/Starter plan, and **[some data is plan-gated](#whats-plan-gated)** — notably
 Variables, i.e. design tokens.
 
-## The four skills
+## The five skills
 
 | Skill | Does |
 | --- | --- |
-| [`figma-to-app`](skills/figma-to-app/SKILL.md) | Orchestrator. Detects your project's stack, then runs the other two in sequence. Trigger this one for the end-to-end task. |
-| [`figma-design-context`](skills/figma-design-context/SKILL.md) | Fetches a Figma file/frame via REST API + personal access token, simplifies it to compact YAML (layout, colors, type, components, interactive states), and exports referenced icons/images as real files. |
+| [`figma-to-app`](skills/figma-to-app/SKILL.md) | Orchestrator. Selects structured REST extraction or authorized browser capture, then generates and verifies against the existing app stack. |
+| [`figma-design-context`](skills/figma-design-context/SKILL.md) | Fetches a Figma file/frame via REST API when protected credentials and budget are available, then emits compact structured YAML and assets. |
+| [`figma-browser-capture`](skills/figma-browser-capture/SKILL.md) | Captures an authorized public or already-authenticated Figma frame without REST, rejects unstable renders, and seals the screenshot plus visible-inspector provenance. |
 | [`visual-fidelity-loop`](skills/visual-fidelity-loop/SKILL.md) | Deterministically screenshots a running implementation, pixel-diffs it against the Figma reference, and runs structured CSS-property assertions — so an agent can iterate to a real match instead of guessing when it's "close enough." |
 | [`figma-responsive-implementation`](skills/figma-responsive-implementation/SKILL.md) | Production-oriented acceptance harness for structured Figma or screenshot-only implementation: persistent design-system memory, unknown-value/token enforcement, responsive probes, localized pixel diffs, accessibility/state gates, protected contracts, adversarial evals, and optional DINOv2 diagnostics. |
 
@@ -46,14 +48,16 @@ references; genuinely unique component geometry can remain local when documented
 
 ## Quick start
 
-After [installing](#install) and exporting a token, just ask your agent, with a link
+After [installing](#install), ask your agent with a link
 to the **specific frame** you want (select the frame in Figma → Copy link to
 selection, so the URL carries a `node-id`):
 
 > Build this in my app: https://www.figma.com/design/KEY/File?node-id=43-44
 
-The agent picks up `figma-to-app` and runs extract → generate → verify. To use the
-extraction on its own:
+The agent picks up `figma-to-app` and runs extract or browser-capture → generate
+→ verify. REST credentials are optional: without them, or after a `429`, the
+pipeline uses authorized browser capture and treats unavailable structure as
+inferred. To use REST extraction on its own:
 
 ```bash
 cd skills/figma-design-context/scripts
@@ -139,16 +143,12 @@ shares this repo's dependencies instead and avoids that.
 
 ## Requirements
 
-- Node.js ≥ 20 — the Figma-side scripts use only built-in `fetch` and have no
-dependencies. `visual-fidelity-loop` additionally needs Playwright; see that skill's
-Prerequisites section.
-- A Figma **personal access token** (Settings → Security → Personal access tokens),
-scoped at minimum to `file_content:read`. Works on every plan, including Free — this
-is not the same thing as a Dev Mode seat, but do read the rate limits above.
-
-```bash
-export FIGMA_API_KEY="figd_..."
-```
+- Node.js ≥ 20. REST extraction uses built-in `fetch`; `figma-browser-capture`
+  and `visual-fidelity-loop` use their pinned Playwright/image dependencies.
+- Optional protected Figma REST credentials scoped to `file_content:read`.
+  Without them, use a public link or an already-authorized local browser session
+  through `figma-browser-capture`. Never place credentials in chat, command
+  arguments, URLs, or logs.
 
 ## Repo layout
 
@@ -156,6 +156,7 @@ export FIGMA_API_KEY="figd_..."
 skills/
   figma-to-app/            orchestrator: stack detection + workflow
   figma-design-context/    Figma REST API -> simplified YAML + asset export
+  figma-browser-capture/   authorized browser -> sealed PNG + inspector evidence
   visual-fidelity-loop/    deterministic capture, pixel diff, structured CSS checks
   figma-responsive-implementation/  protected responsive acceptance contract + eval harness
 install.mjs                deploys skills to every agent's skill directory (see Install)
